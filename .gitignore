@@ -1,0 +1,8 @@
+# Created by .ignore support plugin (hsz.mobi)
+/.idea/
+target/
+*.iml
+*.class
+sink.txt
+sink1.txt
+dependency-reduced-pom.xml
