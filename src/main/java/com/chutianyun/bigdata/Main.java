@@ -1,17 +1,19 @@
 package com.chutianyun.bigdata;
 
 import com.alibaba.excel.EasyExcel;
-import com.alibaba.excel.ExcelReader;
-import com.alibaba.excel.read.metadata.ReadSheet;
-import com.chutianyun.bigdata.listener.CityDataListener;
-import com.chutianyun.bigdata.listener.NoObjectListener;
-import com.chutianyun.bigdata.model.Record;
+import com.chutianyun.bigdata.listener.ParserApplicationExcelListener;
+import com.chutianyun.bigdata.model.ApplicationFileInfo;
+import com.chutianyun.bigdata.model.UserApplicationOfReturn;
+import com.chutianyun.bigdata.parse.ExcelParser;
+import com.chutianyun.bigdata.parse.NormalParser;
+import com.chutianyun.bigdata.parse.XYparser;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author BirdSnail
@@ -20,36 +22,48 @@ import java.nio.file.Paths;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        if (args.length < 5) {
-            System.out.println("参数：<文件输入路径>，<省内结果输出路径>，<省外结果输出路径>,<省份所在字段位置>,<市/区所在字段位置>");
-            return;
+        String start = "C:\\Users\\31472\\Desktop\\返岗";
+        Path entry = new File(start).toPath();
+        List<Path> files = getAllExcelFile(entry);
+
+        List<UserApplicationOfReturn> allApplicationPeople = new ArrayList<>();
+
+        for (Path file : files) {
+            final ApplicationFileInfo fileInfo = ApplicationFileInfo.of(file, start);
+            if (fileInfo.isXiangYang()) {
+                // 襄阳的解析
+                ExcelParser xyParser = new XYparser();
+                EasyExcel.read(file.toFile(),
+                        new ParserApplicationExcelListener(xyParser, allApplicationPeople, fileInfo))
+                        .sheet().doRead();
+            } else {
+                ExcelParser normalParser = new NormalParser();
+                EasyExcel.read(file.toFile(),
+                        new ParserApplicationExcelListener(normalParser, allApplicationPeople, fileInfo))
+                        .sheet().doRead();
+            }
         }
 
-        File file = new File(args[0]);
-        Path targetpath1 = Paths.get(args[1]);
-        Path targetpath2 = Paths.get(args[2]);
-        if (Files.notExists(targetpath1)) {
-            Files.createDirectory(targetpath1);
-        }
-
-        if (Files.notExists(targetpath2)) {
-            Files.createDirectory(targetpath2);
-        }
-
-        EasyExcel.read(file, new NoObjectListener(args[1], args[2], Integer.parseInt(args[3]), Integer.parseInt(args[4]))).sheet().doRead();
-
-//        ExcelReader excelReader = EasyExcel.read(file, Record.class, new CityDataListener(args[1])).build();
-//        ReadSheet readSheet = EasyExcel.readSheet(0).build();
-//
-//        try {
-//            excelReader.read(readSheet);
-//        } finally {
-//            // 这里千万别忘记关闭，读的时候会创建临时文件，到时磁盘会崩的
-//            excelReader.finish();
-//        }
-
-
+        System.out.println(allApplicationPeople.size());
     }
 
 
+    private static List<Path> getAllExcelFile(Path entry) throws IOException {
+        String xlsToFind = ".xls";
+        String xlsxToFind = ".xlsx";
+        List<Path> result = new ArrayList<>();
+
+        Files.walkFileTree(entry, new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                String fileString = file.toAbsolutePath().toString();
+                if (fileString.endsWith(xlsToFind) || fileString.endsWith(xlsxToFind)) {
+//                    System.out.println("file found at path: " + file.toAbsolutePath());
+                    result.add(file);
+                }
+                return FileVisitResult.CONTINUE;
+            }
+        });
+        return result;
+    }
 }
