@@ -3,6 +3,7 @@ package com.chutianyun.bigdata.parse;
 import com.chutianyun.bigdata.model.*;
 import com.chutianyun.bigdata.util.RecordUtil;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,11 @@ import java.util.Map;
  */
 public class XYparser implements ExcelParser {
 
+    private Path current;
+
+    public XYparser(Path current) {
+        this.current = current;
+    }
 
     @Override
     public ApplicationUser parsePerson(Map<Integer, String> record) {
@@ -40,7 +46,7 @@ public class XYparser implements ExcelParser {
 
 
     @Override
-    public List<ApplicationUser> parser(List<Map<Integer, String>> records) {
+    public List<ApplicationUser> parser(List<Map<Integer, String>> records, List<Path> badExcel) {
         if (records.size() < 2) {
             throw new IllegalStateException();
         }
@@ -54,5 +60,10 @@ public class XYparser implements ExcelParser {
         }
 
         return result;
+    }
+
+    @Override
+    public Path currentExcel() {
+        return current;
     }
 }

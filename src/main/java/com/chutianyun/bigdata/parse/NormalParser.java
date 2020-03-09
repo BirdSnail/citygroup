@@ -1,17 +1,22 @@
 package com.chutianyun.bigdata.parse;
 
 import com.chutianyun.bigdata.model.*;
-import com.chutianyun.bigdata.util.RecordUtil;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.nio.file.Path;
 import java.util.Map;
+
 
 /**
  * @author BirdSnail
  * @date 2020/3/8
  */
-public class NormalParser implements ExcelParser{
+public class NormalParser extends AbstractParser {
+
+    private Path current;
+
+    public NormalParser(Path current) {
+        this.current = current;
+    }
 
     /**
      * 正常模式下解析返岗申请表
@@ -38,30 +43,21 @@ public class NormalParser implements ExcelParser{
         appUser.setXJLDXZHBJKZM(record.get(11));
 
         return appUser;
-
     }
-
 
     @Override
-    public List<ApplicationUser> parser(List<Map<Integer, String>> records) {
-        if (records.size() < 6) {
-            throw new IllegalStateException();
-        }
-
-        List<ApplicationUser> result = new ArrayList<>();
-
-        String tbsj = RecordUtil.getTBSJ(records.get(0));
-        CompanyName companyName = CompanyName.of(records.get(1));
-        CompanyOwner companyOwner = CompanyOwner.of(records.get(2));
-
-        for (int i = 5; i < records.size(); i++) {
-            if (RecordUtil.isUserRecord(records.get(i))) {
-                ApplicationUser person = parsePerson(records.get(i));
-                person.setCompany(new CompanyInfo(companyName, companyOwner, tbsj));
-                result.add(person);
-            }
-        }
-
-        return result;
+    public Path currentExcel() {
+        return current;
     }
+
+    @Override
+    public CompanyName createCompanyName(Map<Integer, String> record) {
+        return CompanyName.of(record);
+    }
+
+    @Override
+    public CompanyOwner createCompanyOwner(Map<Integer, String> record) {
+        return CompanyOwner.of(record);
+    }
+
 }

@@ -37,16 +37,24 @@ public class ApplicationFileInfo {
      */
     private String WJZML;
 
+    private Path currentPath;
+
     private static String splitter = File.separator.replace("\\", "\\\\");
 
-    public ApplicationFileInfo(String RKWJ, String WJML, String WJZML) {
+    public ApplicationFileInfo(String RKWJ, String WJML, String WJZML, Path currentPath) {
         this.RKWJ = RKWJ;
         this.WJML = WJML;
         this.WJZML = WJZML;
+        this.currentPath = currentPath;
     }
 
     public boolean isXiangYang() {
-        return RKWJ.startsWith("襄阳市");
+        return WJML.startsWith("襄阳市");
+    }
+
+
+    public boolean isYiChang() {
+        return WJML.startsWith("宜昌市");
     }
 
     public static ApplicationFileInfo of(Path currentFile, String entry) {
@@ -62,9 +70,9 @@ public class ApplicationFileInfo {
         String wjml = dirs[index++];
 
         if (dirs.length < 3) {
-            return new ApplicationFileInfo(rkwj, wjml, fileName);
+            return new ApplicationFileInfo(rkwj, wjml, fileName,currentFile);
         } else {
-            return new ApplicationFileInfo(rkwj, wjml, dirs[index]);
+            return new ApplicationFileInfo(rkwj, wjml, dirs[index], currentFile);
         }
     }
 

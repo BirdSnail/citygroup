@@ -37,21 +37,37 @@ public class CompanyName {
     }
 
     private static final Pattern COMPANY_NAME = Pattern.compile("^企业名称([\\s\\S]*)机构代码([\\s\\S]*)详细地址([\\s\\S]*)");
+    private static final Pattern COMPANY_NAME_YC = Pattern.compile("^企业名称([\\s\\S]*)统一社会信用代码([\\s\\S]*)详细地址([\\s\\S]*)");
+
 
     public static CompanyName of(Map<Integer, String> nameRecord) {
-        List<String> info = RecordUtil.mapToValueList(nameRecord);
+        return create(nameRecord, COMPANY_NAME);
+    }
+
+    /**针对宜昌的申请*/
+    public static CompanyName ofYC(Map<Integer, String> nameRecord) {
+        CompanyName name =create(nameRecord, COMPANY_NAME_YC);
+        if (name == null) {
+            name = create(nameRecord, COMPANY_NAME);
+        }
+        return name;
+    }
+
+
+    private static CompanyName create(Map<Integer, String> nameRecord, Pattern pattern) {
         String name = "";
         String yxdm = "";
         String dz = "";
 
-        String line = String.join("", info).trim();
-        final Matcher matcher = COMPANY_NAME.matcher(line);
+        String line = RecordUtil.recordMapToStr(nameRecord);
+        final Matcher matcher = pattern.matcher(line);
         if (matcher.matches()) {
             name = matcher.group(1);
             yxdm = matcher.group(2);
             dz = matcher.group(3);
+            return new CompanyName(name, yxdm, dz);
+        } else {
+            return null;
         }
-
-        return new CompanyName(name, yxdm, dz);
     }
 }

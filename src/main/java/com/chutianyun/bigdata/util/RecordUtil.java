@@ -71,6 +71,13 @@ public class RecordUtil {
         return Objects.nonNull(record.get(0)) && record.size() > 8;
     }
 
+    /**
+     * 将有值的单元格拼接在一起
+     */
+    public static String recordMapToStr(Map<Integer, String> map) {
+        return String.join("", mapToValueList(map)).trim();
+    }
+
     public static void main(String[] args) {
 
         Matcher matcher = TBSJ.matcher("填报时间：2020年3月5日");

@@ -58,7 +58,9 @@ public class CompanyOwner {
                 returnTime = baseYear.plusDays(Integer.parseInt(returnTime)-2).format(format);
             }
             phoneNum = matcher.group(3);
+            return new CompanyOwner(lxr, returnTime, phoneNum);
+        }else {
+            return null;
         }
-        return new CompanyOwner(lxr, returnTime, phoneNum);
     }
 }

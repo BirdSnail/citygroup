@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chutianyun.bigdata.mybatis.OracleMapper"><!--  接口的全类名 -->
+    <!-- type:实体类的全类名 -->
+    <resultMap id="BaseResultMap" type="com.chutianyun.bigdata.model.oracle.ApplicationPeople">
+        <!--        <id column="ID" property="id" jdbcType="DECIMAL"/>-->
+        <!--        <result column="USERNAME" property="userName" jdbcType="VARCHAR"/>-->
+        <!--        <result column="PASSWORD" property="password" jdbcType="VARCHAR"/>-->
+        <!--        <result column="GENDER" property="gender" jdbcType="CHAR"/>-->
+        <!--        <result column="EMAIL" property="email" jdbcType="VARCHAR"/>-->
+        <!--        <result column="CREATE_DATE" property="createDate" jdbcType="DATE"/>-->
+    </resultMap>
+
+    <!-- id 跟接口中的方法名称保持一致 -->
+    <insert id="batchInsert" parameterType="java.util.List">
+        INSERT INTO
+        test_fgrysq(TBSJ,QYMC,QYTYSHXYDM,QYXXDZ,QYLXR,QYSQFHSJ,QYSJ,XH,XM,SFZH,XZD_SZ,XZD_XSQ,XZD_XXDZ,XZD_SJ,
+        XZD_GWGZ,JSY_FGRY,CLPZH,QYSZDXZHBSHYJ,XJLDXZHBJKZM,RKWJ,WJML,WJZML)
+        (
+        <foreach collection="list" index="" item="applicationPeople" separator="union all">
+            select
+            #{applicationPeople.TBSJ},
+            #{applicationPeople.QYMC},
+            #{applicationPeople.QYTYSHXYDM},
+            #{applicationPeople.QYXXDZ},
+            #{applicationPeople.QYLXR},
+            #{applicationPeople.QYSQFHSJ},
+            #{applicationPeople.QYSJ},
+            #{applicationPeople.XH},
+            #{applicationPeople.XM},
+            #{applicationPeople.SFZH},
+            #{applicationPeople.XZD_SZ},
+            #{applicationPeople.XZD_XSQ},
+            #{applicationPeople.XZD_XXDZ},
+            #{applicationPeople.XZD_SJ},
+            #{applicationPeople.XZD_GWGZ},
+            #{applicationPeople.JSY_FGRY},
+            #{applicationPeople.CLPZH},
+            #{applicationPeople.QYSZDXZHBSHYJ},
+            #{applicationPeople.XJLDXZHBJKZM},
+            #{applicationPeople.RKWJ},
+            #{applicationPeople.WJML},
+            #{applicationPeople.WJZML}
+            from dual
+        </foreach>
+        )
+    </insert>
+
+</mapper>
