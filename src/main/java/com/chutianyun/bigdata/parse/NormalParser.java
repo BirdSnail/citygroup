@@ -31,7 +31,7 @@ public class NormalParser extends AbstractParser {
 
         appUser.setXH(record.get(0));
         appUser.setXM(record.get(1));
-        appUser.setSFZH(record.get(2));
+        appUser.setSFZH(foramtSFZH(record.get(2)));
         appUser.setXZD_SZ(record.get(3));
         appUser.setXZD_XSQ(record.get(4));
         appUser.setXZD_XXDZ(record.get(5));

@@ -52,14 +52,10 @@ public class CompanyOwner {
         Matcher matcher = COMPANY_OWNER.matcher(line);
         if (matcher.matches()) {
             lxr = matcher.group(1);
-            returnTime = matcher.group(2);
-            if (returnTime.startsWith("439")) {
-                final LocalDate baseYear = LocalDate.ofYearDay(1900, 1);
-                returnTime = baseYear.plusDays(Integer.parseInt(returnTime)-2).format(format);
-            }
+            returnTime = RecordUtil.foramtTime(matcher.group(2));
             phoneNum = matcher.group(3);
             return new CompanyOwner(lxr, returnTime, phoneNum);
-        }else {
+        } else {
             return null;
         }
     }

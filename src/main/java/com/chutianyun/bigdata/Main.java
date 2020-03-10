@@ -27,12 +27,18 @@ import java.util.stream.Collectors;
  */
 public class Main {
 
-    static List<UserApplicationOfReturn> allApplicationPeople = new ArrayList<>();
-    static List<Path> badExcel = new ArrayList<>();
 
     public static void main(String[] args) {
+        if (args.length < 2) {
+            System.out.println("参数不正确: usage: java -jar xxx.jar <filePath> <targetPath>");
+            return;
+        }
+
         String start = args[0];
         Path entry = new File(start).toPath();
+
+        List<UserApplicationOfReturn> allApplicationPeople = new ArrayList<>();
+        List<Path> badExcel = new ArrayList<>();
 
         try {
             List<Path> files = getAllExcelFile(entry);
@@ -57,19 +63,29 @@ public class Main {
         }
 
         System.out.println("读取到的申请人数：" + allApplicationPeople.size());
+        List<ApplicationPeople> finalResult = transToApplicationPeopleList(allApplicationPeople);
 
-        afterParse();
-//        OracleOperator.batchInsert(transToApplicationPeopleList(allApplicationPeople));
+        File target = new File(args[1] + "result.xlsx");
+        EasyExcel.write(target, ApplicationPeople.class).sheet("模板").doWrite(finalResult);
 
+        writeToOracleAfterParse(badExcel, finalResult);
     }
 
-    private static void afterParse() {
+    private static void writeToOracleAfterParse(List<Path> badExcel, List<ApplicationPeople> allApplicationPeople) {
         if (badExcel.size() != 0) {
             badExcel.forEach(e -> System.out.println("该excel有问题：" + e.toAbsolutePath().toString()));
         } else {
-            System.out.println("全部成功");
+            System.out.println("恭喜全部解析成功。。。开始入库");
+            try {
+                OracleOperator.batchInsert(allApplicationPeople);
+                System.out.println("入库成功");
+            } catch (IOException e) {
+                System.out.println("入库失败");
+                e.printStackTrace();
+            }
         }
     }
+
 
     private static List<Path> getAllExcelFile(Path entry) throws IOException {
         String xlsToFind = ".xls";

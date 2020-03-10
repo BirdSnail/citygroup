@@ -31,7 +31,7 @@ public class XYparser implements ExcelParser {
         ApplicationUser person = new ApplicationUser();
         person.setCompany(company);
         person.setXM(record.get(0));
-        person.setSFZH(record.get(1));
+        person.setSFZH(foramtSFZH(record.get(1)));
         person.setXZD_SZ(record.get(3));
         person.setXZD_XSQ(record.get(4));
         person.setXZD_XXDZ(record.get(5));

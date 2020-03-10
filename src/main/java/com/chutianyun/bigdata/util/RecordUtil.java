@@ -1,6 +1,9 @@
 package com.chutianyun.bigdata.util;
 
 
+import com.chutianyun.bigdata.model.CompanyOwner;
+
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +21,8 @@ public class RecordUtil {
     public static final Pattern TBSJ = Pattern.compile("^填报时间[:：\\s]?([\\s|\\S]*)");
 
     public static final Pattern NUM = Pattern.compile("[0-9].*");
+
+    public static final LocalDate baseYear = LocalDate.ofYearDay(1900, 1);
 
     /**
      * 获取填报时间
@@ -49,6 +54,9 @@ public class RecordUtil {
             throw new IllegalStateException();
         }
         String group = matcher.group(1);
+        if (group.startsWith("43")) {
+
+        }
 //        System.out.println(group);
         return group;
     }
@@ -76,6 +84,13 @@ public class RecordUtil {
      */
     public static String recordMapToStr(Map<Integer, String> map) {
         return String.join("", mapToValueList(map)).trim();
+    }
+
+    public static String foramtTime(String time) {
+        if (time.startsWith("43")){
+            time =  baseYear.plusDays(Integer.parseInt(time) - 2).format(CompanyOwner.format);
+        }
+        return time;
     }
 
     public static void main(String[] args) {

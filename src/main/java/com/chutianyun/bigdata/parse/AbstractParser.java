@@ -23,7 +23,7 @@ public abstract class AbstractParser implements ExcelParser {
     abstract CompanyOwner createCompanyOwner(Map<Integer, String> record);
 
     public String getTBSJ(List<Map<Integer, String>> records){
-        return RecordUtil.getTBSJ(records.get(0));
+        return RecordUtil.foramtTime(RecordUtil.getTBSJ(records.get(0)).replace("填报时间", ""));
      }
 
     @Override

@@ -5,6 +5,7 @@ import com.chutianyun.bigdata.model.ApplicationUser;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 解析excel文件
@@ -35,4 +36,10 @@ public interface ExcelParser {
      */
     Path currentExcel();
 
+    default String foramtSFZH(String id) {
+        if (!Objects.isNull(id)) {
+            id = id.replace(",", "").replace("，", "");
+        }
+        return id;
+    }
 }
