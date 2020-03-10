@@ -64,12 +64,12 @@ public class Main {
         }
 
         System.out.println("读取到的申请人数：" + allApplicationPeople.size());
-        List<ApplicationPeople> finalResult = transToApplicationPeopleList(allApplicationPeople);
-
         File target = new File(args[1] + "result.xlsx");
         if (target.exists()) {
             target.delete();
         }
+
+        List<ApplicationPeople> finalResult = transToApplicationPeopleList(allApplicationPeople);
         EasyExcel.write(target, ApplicationPeople.class).sheet().doWrite(finalResult);
         System.out.println("我将所有的申请人保存到了一个excel方便查看：" + target.getAbsolutePath());
 
@@ -79,11 +79,6 @@ public class Main {
     private static void writeToOracleAfterParse(List<Path> badExcel, List<ApplicationPeople> allApplicationPeople) {
         if (badExcel.size() != 0) {
             badExcel.forEach(e -> System.out.println("该excel有问题：" + e.toAbsolutePath().toString()));
-            try {
-                OracleOperator.batchInsert(Collections.singletonList(allApplicationPeople.get(0)));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         } else {
             System.out.println("恭喜全部解析成功。。。开始入库");
             try {

@@ -22,8 +22,10 @@ public class OracleOperator {
         InputStream inputStream = Resources.getResourceAsStream(resource);
         SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
         try (SqlSession session = sqlSessionFactory.openSession()) {
+            System.out.println("获取一个oracle session成功");
             OracleMapper mapper = session.getMapper(OracleMapper.class);
             mapper.batchInsert(people);
+            session.commit();
         }
     }
 
