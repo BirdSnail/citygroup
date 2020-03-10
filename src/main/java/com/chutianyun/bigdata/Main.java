@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -59,14 +60,18 @@ public class Main {
                         .sheet().doRead();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         System.out.println("读取到的申请人数：" + allApplicationPeople.size());
         List<ApplicationPeople> finalResult = transToApplicationPeopleList(allApplicationPeople);
 
         File target = new File(args[1] + "result.xlsx");
-        EasyExcel.write(target, ApplicationPeople.class).sheet("模板").doWrite(finalResult);
+        if (target.exists()) {
+            target.delete();
+        }
+        EasyExcel.write(target, ApplicationPeople.class).sheet().doWrite(finalResult);
+        System.out.println("我将所有的申请人保存到了一个excel方便查看：" + target.getAbsolutePath());
 
         writeToOracleAfterParse(badExcel, finalResult);
     }
@@ -74,6 +79,11 @@ public class Main {
     private static void writeToOracleAfterParse(List<Path> badExcel, List<ApplicationPeople> allApplicationPeople) {
         if (badExcel.size() != 0) {
             badExcel.forEach(e -> System.out.println("该excel有问题：" + e.toAbsolutePath().toString()));
+            try {
+                OracleOperator.batchInsert(Collections.singletonList(allApplicationPeople.get(0)));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         } else {
             System.out.println("恭喜全部解析成功。。。开始入库");
             try {
@@ -96,6 +106,9 @@ public class Main {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                 String fileString = file.toAbsolutePath().toString();
+                if (file.getFileName().toString().startsWith("~$")) {
+                    return FileVisitResult.CONTINUE;
+                }
                 if (fileString.endsWith(xlsToFind) || fileString.endsWith(xlsxToFind)) {
 //                    System.out.println("file found at path: " + file.toAbsolutePath());
                     result.add(file);
